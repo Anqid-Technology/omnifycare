@@ -57,6 +57,18 @@ export default async function DashboardPage() {
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span style={{ fontSize: 13, opacity: 0.7 }}>{user.email}</span>
+          <a href="/settings/branding" style={{
+            background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)',
+            color: '#fff', borderRadius: 8, padding: '5px 12px', fontSize: 13, textDecoration: 'none'
+          }}>
+            ⚙ Branding
+          </a>
+          <a href="/documents/new" style={{
+            background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)',
+            color: '#fff', borderRadius: 8, padding: '5px 12px', fontSize: 13, textDecoration: 'none'
+          }}>
+            Documents
+          </a>
           <form action="/auth/signout" method="post">
             <button style={{
               background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)',
@@ -119,18 +131,15 @@ export default async function DashboardPage() {
               const tc = TYPE_COLORS[prog.type] || TYPE_COLORS.other
               const days = prog.target_date ? daysTo(prog.target_date) : null
               return (
-                <Link key={prog.id} href={`/programs/${prog.id}`} style={{ textDecoration: 'none' }}>
-                  <div style={{
+                <div key={prog.id} style={{
                     background: '#fff', border: '1px solid #E2DED6', borderRadius: 12,
-                    padding: 20, cursor: 'pointer', transition: 'box-shadow 0.15s',
-                    height: '100%'
-                  }}
-                  >
+                    padding: 20, height: '100%'
+                  }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                       <div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1916' }}>
+                        <Link href={`/programs/${prog.id}`} style={{ fontSize: 15, fontWeight: 700, color: '#1A1916', textDecoration: 'none' }}>
                           {prog.name}
-                        </div>
+                        </Link>
                         <div style={{ fontSize: 12, color: '#5C5A54', marginTop: 2 }}>
                           {prog.entity}
                         </div>
@@ -166,8 +175,20 @@ export default async function DashboardPage() {
                     }}>
                       {STATUS_LABELS[prog.status] || prog.status}
                     </div>
+
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #E2DED6', display: 'flex', gap: 8 }}>
+                      <a href={`/documents/new?program_id=${prog.id}`} style={{
+                        fontSize: 12, padding: '5px 12px', borderRadius: 8,
+                        background: '#1B4332', color: '#fff', textDecoration: 'none', fontWeight: 600,
+                        display: 'inline-block'
+                      }}>+ New Document</a>
+                      <a href={`/documents?program_id=${prog.id}`} style={{
+                        fontSize: 12, padding: '5px 12px', borderRadius: 8,
+                        border: '1px solid #E2DED6', color: '#5C5A54', textDecoration: 'none',
+                        display: 'inline-block'
+                      }}>View Documents</a>
+                    </div>
                   </div>
-                </Link>
               )
             })}
           </div>

@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(mkdir -p src/components/editor/extensions)",
+      "Bash(mkdir -p src/components/editor/toolbar)",
+      "Bash(mkdir -p src/components/editor/blocks)",
+      "Bash(mkdir -p src/components/editor/sidebar)",
+      "Bash(mkdir -p src/components/signature)",
+      "Bash(touch:*)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }
