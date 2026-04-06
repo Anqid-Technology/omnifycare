@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { sanitizeForAI } from '@/lib/security/redact'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,20 +12,26 @@ export async function POST(request: NextRequest) {
     const stream = client.messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
-      system:
-        'You are a compliance document writer for Oregon healthcare facilities. You write professional, ' +
-        'regulatory-compliant content for residential treatment homes (RTH) licensed under OHA Behavioral ' +
-        'Health Division. Your writing style is formal, precise, and meets OAR 309-035 standards. ' +
-        'When writing content, include specific OAR rule references where relevant. Write in third person. ' +
-        'Do not include markdown formatting — write plain text suitable for a document editor.',
+      system: [
+        {
+          type: "text" as const,
+          text:
+            'You are a compliance document writer for Oregon healthcare facilities. You write professional, ' +
+            'regulatory-compliant content for residential treatment homes (RTH) licensed under OHA Behavioral ' +
+            'Health Division. Your writing style is formal, precise, and meets OAR 309-035 standards. ' +
+            'When writing content, include specific OAR rule references where relevant. Write in third person. ' +
+            'Do not include markdown formatting — write plain text suitable for a document editor.',
+          cache_control: { type: "ephemeral" as const },
+        },
+      ],
       messages: [
         {
           role: 'user',
           content:
             `Fill in or expand the following section of a ${docType} document.\n` +
             `Section type: ${sectionType}\n\n` +
-            `Current text to replace or expand:\n${selectedText}\n\n` +
-            `Surrounding context:\n${surroundingContext}\n\n` +
+            `Current text to replace or expand:\n${sanitizeForAI(selectedText)}\n\n` +
+            `Surrounding context:\n${sanitizeForAI(surroundingContext)}\n\n` +
             `Write a complete, professional version of this section. If it's a policy, include purpose, ` +
             `scope, and procedures. If it's a form field label, keep it concise. Match the tone and ` +
             `detail level of the surrounding content.`,

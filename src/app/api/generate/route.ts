@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 import { buildDocument, type StructuredDoc, type OrgBranding } from '@/lib/documents/builder'
+import { sanitizeForAI } from '@/lib/security/redact'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -102,17 +103,25 @@ export async function POST(req: NextRequest) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ status: 'Generating document content...' })}\n\n`))
 
           // Generate structured JSON content
+          const userPrompt = sanitizeForAI(
+            `Generate a complete, submission-ready document: ${dtype}\n\n` +
+            `This document will be used for an OHA RTH licensing application. Write every section completely — no abbreviations, no placeholders. Include all required elements per OAR 309-035.\n\n` +
+            `Return ONLY the JSON object.`
+          )
+
           const message = await client.messages.create({
             model: 'claude-opus-4-5',
             max_tokens: 8000,
-            system: buildSystemPrompt(program),
+            system: [
+              {
+                type: "text" as const,
+                text: buildSystemPrompt(program),
+                cache_control: { type: "ephemeral" as const },
+              },
+            ],
             messages: [{
               role: 'user',
-              content: `Generate a complete, submission-ready document: ${dtype}
-
-This document will be used for an OHA RTH licensing application. Write every section completely — no abbreviations, no placeholders. Include all required elements per OAR 309-035.
-
-Return ONLY the JSON object.`
+              content: userPrompt
             }]
           })
 

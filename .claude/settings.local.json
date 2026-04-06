@@ -9,7 +9,9 @@
       "Bash(mkdir -p src/components/editor/sidebar)",
       "Bash(mkdir -p src/components/signature)",
       "Bash(touch:*)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(claude mcp:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
